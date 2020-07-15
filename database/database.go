@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 )
 
 // GetClient connection to the Database
-func GetClient(ctx context.Context, dbConfig config.DatabaseConfigurations) (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI("mongodb://+ "+ dbConfig.IP + ":" + dbConfig.Port + "/")
+func GetClient(ctx context.Context, dbConfig config.DatabaseConfiguration) (*mongo.Client, error) {
+	clientOptions := options.Client().ApplyURI("mongodb://" + dbConfig.DBUser + ":" + dbConfig.DBPass + "@" + dbConfig.IP + ":" + dbConfig.Port)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)

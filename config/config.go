@@ -1,12 +1,14 @@
 package config
 
 // StorageConfigurations exported
-type StorageConfigurations struct {
-	PeerAddr string
+type StorageConfiguration struct {
+	ClusterPeerAddr string
+	ClusterUser     string
+	ClusterPass     string
 }
 
 // DatabaseConfigurations exported
-type DatabaseConfigurations struct {
+type DatabaseConfiguration struct {
 	IP     string
 	Port   string
 	DBName string

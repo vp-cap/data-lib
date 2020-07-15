@@ -1,26 +1,32 @@
 package storage
 
 import (
-	"context"
 	"log"
 
 	config "cap/data-lib/config"
-	// ifpsClient "github.com/ipfs/ipfs-cluster/api/rest/client"
+	multiaddr "github.com/multiformats/go-multiaddr"
+	client "github.com/ipfs/ipfs-cluster/api/rest/client"
 )
 
 // GetClient connection to the Storage Server
-// func GetClient(ctx context.Context, storageConfig config.StorageConfiguration) , error) {
-	// cfg := &ifpsClient.Config{
-	// 	APIAddr:           peerMAddr(api),
-	// 	ProtectorKey:      make([]byte, 32),
-	// 	DisableKeepAlives: true,
-	// }
-	// c, err := ifpsClient.NewDefaultClient(cfg)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return nil.
-	// }
-	// return c.(*defaultClient)
-	
-	// return client, nil
-// }
+func GetClient(storageConfig config.StorageConfiguration) (client.Client, error) {
+	peerAddr, err := multiaddr.NewMultiaddr(storageConfig.ClusterPeerAddr)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	log.Println(peerAddr)
+	clusterClient, err := client.NewDefaultClient(&client.Config{
+		APIAddr:  peerAddr,
+		Username: storageConfig.ClusterUser,
+		Password: storageConfig.ClusterPass,
+		LogLevel: "info",
+	})
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return clusterClient, nil
+}

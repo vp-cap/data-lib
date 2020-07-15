@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+
 )
 
 // constants
@@ -39,7 +39,7 @@ func GetVideo(ctx context.Context, db *mongo.Database, name string) (Video, erro
 	err := collection.FindOne(ctx, bson.M{"_id" : name}).Decode(&video)
 	if (err != nil) {
 		log.Println(err)
-		return nil, err
+		return video, err
 	}
 	return video, nil
 }
