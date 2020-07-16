@@ -3,10 +3,8 @@ package database
 import (
 	"log"
 	"context"
-	
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/bson"
 
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // constants
@@ -14,16 +12,9 @@ const (
 	VideoCollection = "Videos"
 )
 
-// Video Struct
-type Video struct {
-	Name        string               `bson:"_id,omitempty"` // name unique
-	Description string               `bson:"desc,omitempty"`
-	StorageLink string               `bson:"link,omitempty"`
-}
-
 // InsertVideo into the collection
-func InsertVideo(ctx context.Context, db *mongo.Database, video Video) error {
-	collection := db.Collection(VideoCollection)
+func (mongoDB *MongoDB) InsertVideo(ctx context.Context, video Video) error {
+	collection := mongoDB.DB.Collection(VideoCollection)
 	_, err := collection.InsertOne(ctx, video)
 	if (err != nil) {
 		log.Println(err)
@@ -33,8 +24,8 @@ func InsertVideo(ctx context.Context, db *mongo.Database, video Video) error {
 }
 
 // GetVideo from the collection
-func GetVideo(ctx context.Context, db *mongo.Database, name string) (Video, error) {
-	collection := db.Collection(VideoCollection)
+func (mongoDB *MongoDB) GetVideo(ctx context.Context, name string) (Video, error) {
+	collection := mongoDB.DB.Collection(VideoCollection)
 	var video Video
 	err := collection.FindOne(ctx, bson.M{"_id" : name}).Decode(&video)
 	if (err != nil) {
