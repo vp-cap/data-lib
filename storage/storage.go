@@ -12,34 +12,44 @@ import (
 // Storage interface
 type Storage interface {
 	UploadVideo(context.Context, string) (string, error)
+	GetVideo(context.Context, string, string) error
 }
 
-// IPFS Storage struct
-type IPFS struct {
+// IPFSCluster Storage struct
+type IPFSCluster struct {
 	Client clusterClient.Client
 }
 
-// GetIPFSStorage connection to the Storage Server
-func GetIPFSStorage(storageConfig config.StorageConfiguration) (*IPFS, error) {
-	peerAddr, err := multiaddr.NewMultiaddr(storageConfig.ClusterPeerAddr)
+// GetIPFSClusterStorage connection to the Storage Server
+func GetIPFSClusterStorage(storageConfig config.StorageConfiguration) (*IPFSCluster, error) {
+	clusterAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.ClusterAPIAddr)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	ipfsAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.IPFSAPIAddr)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
 	client, err := clusterClient.NewDefaultClient(&clusterClient.Config{
-		APIAddr:  peerAddr,
+		APIAddr:  clusterAPIAddr,
+		ProxyAddr: ipfsAPIAddr,
 		Username: storageConfig.ClusterUser,
 		Password: storageConfig.ClusterPass,
 		LogLevel: "info",
 	})
-	log.Println(client)
-	log.Println(client)
 	
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
-	return &IPFS{Client: client}, nil
+	return &IPFSCluster{Client: client}, nil
 }
+
+// GetStorageClient using the configuration
+func GetStorageClient(storageConfig config.StorageConfiguration) (Storage, error) {
+	return GetIPFSClusterStorage(storageConfig)
+} 

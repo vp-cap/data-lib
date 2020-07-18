@@ -2,9 +2,10 @@ package config
 
 // StorageConfigurations exported
 type StorageConfiguration struct {
-	ClusterPeerAddr string
-	ClusterUser     string
-	ClusterPass     string
+	ClusterAPIAddr string
+	IPFSAPIAddr    string
+	ClusterUser    string
+	ClusterPass    string
 }
 
 // DatabaseConfigurations exported

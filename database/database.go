@@ -28,7 +28,7 @@ type MongoDB struct {
 	DB     *mongo.Database
 }
 
-// GetMongoDB struct
+// GetMongoDB client connection to the database
 func GetMongoDB(ctx context.Context, dbConfig config.DatabaseConfiguration) (*MongoDB, error) {
 	clientOptions := options.Client().ApplyURI("mongodb://" + dbConfig.DBUser + ":" + dbConfig.DBPass + "@" + dbConfig.IP + ":" + dbConfig.Port)
 	client, err := mongo.Connect(ctx, clientOptions)
@@ -40,4 +40,9 @@ func GetMongoDB(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 		Client: client,
 		DB: client.Database(dbConfig.DBName),
 	}, nil
+}
+
+// GetDatabaseClient based on the configuration
+func GetDatabaseClient(ctx context.Context, dbConfig config.DatabaseConfiguration) (Database, error) {
+	return GetMongoDB(ctx, dbConfig)
 }
