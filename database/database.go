@@ -2,11 +2,8 @@ package database
 
 import (
 	"context"
-	"log"
 
 	config "cap/data-lib/config"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Video Struct
@@ -16,30 +13,28 @@ type Video struct {
 	StorageLink string               `bson:"link,omitempty"`
 }
 
+// Advertisement Struct
+type Advertisement struct {
+	Name            string            `bson:"_id,omitempty"` // name unique
+	ImageLink       string            `bson:"desc,omitempty"`
+	RelevantObjects []string          `bson:"objects,omitempty"`
+}
+
+// VideoInference Struct
+type VideoInference struct {
+	Name            string               `bson:"_id,omitempty"` // video name
+	TimeToObject    map[int64]string   `bson:"timeToObject,omitempty"`
+	ObjectFrequency map[string]int64     `bson:"objectFreq,omitempty"`
+}
+
 // Database Interface
 type Database interface {
 	InsertVideo(context.Context, Video) error
 	GetVideo(context.Context, string) (Video, error)
-}
-
-// MongoDB struct 
-type MongoDB struct {
-	Client *mongo.Client
-	DB     *mongo.Database
-}
-
-// GetMongoDB client connection to the database
-func GetMongoDB(ctx context.Context, dbConfig config.DatabaseConfiguration) (*MongoDB, error) {
-	clientOptions := options.Client().ApplyURI("mongodb://" + dbConfig.DBUser + ":" + dbConfig.DBPass + "@" + dbConfig.IP + ":" + dbConfig.Port)
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	return &MongoDB{
-		Client: client,
-		DB: client.Database(dbConfig.DBName),
-	}, nil
+	InsertAd(context.Context, Advertisement) error
+	GetAd(context.Context, string) (Advertisement, error)
+	InsertVideoInference(context.Context, VideoInference) error
+	GetVideoInference(context.Context, string) (VideoInference, error)
 }
 
 // GetDatabaseClient based on the configuration
