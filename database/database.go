@@ -20,11 +20,19 @@ type Advertisement struct {
 	RelevantObjects []string          `bson:"objects,omitempty"`
 }
 
+// Interval struct
+type Interval struct {
+	Start int32
+	End   int32
+}
+
 // VideoInference Struct
 type VideoInference struct {
-	Name            string               `bson:"_id,omitempty"` // video name
-	TimeToObject    map[int64]string   `bson:"timeToObject,omitempty"`
-	ObjectFrequency map[string]int64     `bson:"objectFreq,omitempty"`
+	Name                         string               `bson:"_id,omitempty"` // video name
+	ObjectCountsEachSecond       string          
+	ObjectsToAvgFrequency        map[string]float32  
+	TopFiveObjectsToInterval     map[string]Interval
+	TopFiveObjectsToAvgFrequency map[string]float32   `bson:"timeToObject,omitempty"`
 }
 
 // Database Interface
