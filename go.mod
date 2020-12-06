@@ -1,4 +1,4 @@
-module vp-cap/data-lib
+module github.com/vp-cap/data-lib
 
 go 1.14
 
