@@ -1,10 +1,11 @@
 package database
 
 import (
-	"log"
 	"context"
+	"log"
 
-	config "cap/data-lib/config" 
+	config "vp-cap/data-lib/config"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -4,10 +4,11 @@ import (
 	"context"
 	"log"
 
-	config "cap/data-lib/config"
+	config "vp-cap/data-lib/config"
+
 	api "github.com/ipfs/ipfs-cluster/api"
-	multiaddr "github.com/multiformats/go-multiaddr"
 	clusterClient "github.com/ipfs/ipfs-cluster/api/rest/client"
+	multiaddr "github.com/multiformats/go-multiaddr"
 )
 
 // IPFSCluster Storage struct

@@ -3,21 +3,21 @@ package database
 import (
 	"context"
 
-	config "cap/data-lib/config"
+	config "vp-cap/data-lib/config"
 )
 
 // Video Struct
 type Video struct {
-	Name        string               `bson:"_id,omitempty"` // name unique
-	Description string               `bson:"desc,omitempty"`
-	StorageLink string               `bson:"link,omitempty"`
+	Name        string `bson:"_id,omitempty"` // name unique
+	Description string `bson:"desc,omitempty"`
+	StorageLink string `bson:"link,omitempty"`
 }
 
 // Advertisement Struct
 type Advertisement struct {
-	Name      string                 `bson:"_id,omitempty"`
-	ImageLink string                 `bson:"link,omitempty"`
-	Object    string                 `bson:"object,omitempty"`
+	Name      string `bson:"_id,omitempty"`
+	ImageLink string `bson:"link,omitempty"`
+	Object    string `bson:"object,omitempty"`
 }
 
 // Interval struct
@@ -28,11 +28,11 @@ type Interval struct {
 
 // VideoInference Struct
 type VideoInference struct {
-	Name                         string               `bson:"_id,omitempty"` // video name
-	ObjectCountsEachSecond       string          
-	ObjectsToAvgFrequency        map[string]float32  
+	Name                         string `bson:"_id,omitempty"` // video name
+	ObjectCountsEachSecond       string
+	ObjectsToAvgFrequency        map[string]float32
 	TopFiveObjectsToInterval     map[string]Interval
-	TopFiveObjectsToAvgFrequency map[string]float32   `bson:"timeToObject,omitempty"`
+	TopFiveObjectsToAvgFrequency map[string]float32 `bson:"timeToObject,omitempty"`
 }
 
 // Database Interface
@@ -42,7 +42,7 @@ type Database interface {
 	GetAllVideos(context.Context) ([]Video, error)
 	InsertAd(context.Context, Advertisement) error
 	GetAd(context.Context, string) (Advertisement, error)
-	FindAdsWithObjects(context.Context, []string) ([]Advertisement, error) 
+	FindAdsWithObjects(context.Context, []string) ([]Advertisement, error)
 	InsertVideoInference(context.Context, VideoInference) error
 	GetVideoInference(context.Context, string) (VideoInference, error)
 }

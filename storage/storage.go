@@ -2,8 +2,8 @@ package storage
 
 import (
 	"context"
-	
-	config "cap/data-lib/config"
+
+	config "vp-cap/data-lib/config"
 )
 
 // Storage interface
