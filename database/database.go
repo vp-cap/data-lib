@@ -15,9 +15,9 @@ type Video struct {
 
 // Advertisement Struct
 type Advertisement struct {
-	Name            string            `bson:"_id,omitempty"` // name unique
-	ImageLink       string            `bson:"desc,omitempty"`
-	RelevantObjects []string          `bson:"objects,omitempty"`
+	Name      string                 `bson:"_id,omitempty"`
+	ImageLink string                 `bson:"link,omitempty"`
+	Object    string                 `bson:"object,omitempty"`
 }
 
 // Interval struct
@@ -39,8 +39,10 @@ type VideoInference struct {
 type Database interface {
 	InsertVideo(context.Context, Video) error
 	GetVideo(context.Context, string) (Video, error)
+	GetAllVideos(context.Context) ([]Video, error)
 	InsertAd(context.Context, Advertisement) error
 	GetAd(context.Context, string) (Advertisement, error)
+	FindAdsWithObjects(context.Context, []string) ([]Advertisement, error) 
 	InsertVideoInference(context.Context, VideoInference) error
 	GetVideoInference(context.Context, string) (VideoInference, error)
 }

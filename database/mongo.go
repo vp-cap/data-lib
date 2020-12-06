@@ -31,6 +31,12 @@ func GetMongoDB(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 		log.Fatal(err)
 		return nil, err
 	}
+	adCollection := client.Database(dbConfig.DBName).Collection(AdCollection)
+	_, err = adCollection.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: bson.D{{"object", "text"}},})
+	if err != nil {
+		return nil, err
+	}
 	return &MongoDB{
 		Client: client,
 		DB: client.Database(dbConfig.DBName),
@@ -104,4 +110,40 @@ func (mongoDB *MongoDB) GetVideoInference(ctx context.Context, name string) (Vid
 		return videoInference, err
 	}
 	return videoInference, nil
+}
+
+// GetAllVideos from the collection
+func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
+	collection := mongoDB.DB.Collection(VideoCollection)
+	var videos []Video	
+	cur, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		log.Println(err)
+		return videos, err
+	}
+	err = cur.All(ctx, &videos)
+	if err != nil {
+		log.Println(err)
+		return videos, err
+	}
+
+	return videos, nil
+}
+
+// FindAdsWithObjects find all ads that have objects in the given object list
+func (mongoDB *MongoDB) FindAdsWithObjects(ctx context.Context, objects []string) ([]Advertisement, error) {
+	collection := mongoDB.DB.Collection(AdCollection)
+	var ads []Advertisement	
+	cur, err := collection.Find(ctx, bson.M{"object": bson.M{"$in": objects}})
+	if err != nil {
+		log.Println(err)
+		return ads, err
+	}
+	err = cur.All(ctx, &ads)
+	if err != nil {
+		log.Println(err)
+		return ads, err
+	}
+
+	return ads, nil
 }
