@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 
-	config "vp-cap/data-lib/config"
+	config "github.com/vp-cap/data-lib/config"
 )
 
 // Video Struct

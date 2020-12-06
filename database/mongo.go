@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	config "vp-cap/data-lib/config"
+	config "github.com/vp-cap/data-lib/config"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

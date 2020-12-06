@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	config "vp-cap/data-lib/config"
+	config "github.com/vp-cap/data-lib/config"
 
 	api "github.com/ipfs/ipfs-cluster/api"
 	clusterClient "github.com/ipfs/ipfs-cluster/api/rest/client"

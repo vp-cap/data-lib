@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	config "vp-cap/data-lib/config"
+	config "github.com/vp-cap/data-lib/config"
 )
 
 // Storage interface
