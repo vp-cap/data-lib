@@ -15,9 +15,10 @@ type Video struct {
 
 // Advertisement Struct
 type Advertisement struct {
-	Name      string `bson:"_id,omitempty"`
-	ImageLink string `bson:"link,omitempty"`
-	Object    string `bson:"object,omitempty"`
+	Name        string `bson:"_id,omitempty"`
+	ImageLink   string `bson:"link,omitempty"`
+	RedirectURL string `bson:"redirectUrl,omitempty"`
+	Object      string `bson:"object,omitempty"`
 }
 
 // Interval struct
