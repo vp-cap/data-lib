@@ -10,9 +10,8 @@ type StorageConfiguration struct {
 
 // DatabaseConfigurations exported
 type DatabaseConfiguration struct {
-	IP     string
-	Port   string
-	DBName string
-	DBPass string
-	DBUser string
+	Address string
+	DBName  string
+	DBPass  string
+	DBUser  string
 }

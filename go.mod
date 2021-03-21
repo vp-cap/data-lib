@@ -1,6 +1,6 @@
 module github.com/vp-cap/data-lib
 
-go 1.14
+go 1.15
 
 require (
 	github.com/ipfs/ipfs-cluster v0.13.0

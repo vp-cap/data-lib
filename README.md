@@ -1,5 +1,5 @@
-# data-lib
-CAP Database and Storage interaction library
+# Data lib
+VP-CAP Database and Storage interaction library
 
 
 ## References
