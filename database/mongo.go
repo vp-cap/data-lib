@@ -116,7 +116,7 @@ func (mongoDB *MongoDB) GetVideoInference(ctx context.Context, name string) (Vid
 // GetAllVideos from the collection
 func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
 	collection := mongoDB.DB.Collection(VideoCollection)
-	var videos []Video	
+	var videos []Video	= make([]Video, 0)
 	cur, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		log.Println(err)
@@ -134,7 +134,7 @@ func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
 // FindAdsWithObjects find all ads that have objects in the given object list
 func (mongoDB *MongoDB) FindAdsWithObjects(ctx context.Context, objects []string) ([]Advertisement, error) {
 	collection := mongoDB.DB.Collection(AdCollection)
-	var ads []Advertisement	
+	var ads []Advertisement	= make([]Advertisement, 0)
 	cur, err := collection.Find(ctx, bson.M{"object": bson.M{"$in": objects}})
 	if err != nil {
 		log.Println(err)
@@ -145,6 +145,5 @@ func (mongoDB *MongoDB) FindAdsWithObjects(ctx context.Context, objects []string
 		log.Println(err)
 		return ads, err
 	}
-
 	return ads, nil
 }
