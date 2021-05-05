@@ -98,7 +98,7 @@ func (mongoDB *MongoDB) GetAd(ctx context.Context, name string) (Advertisement, 
 
 // InsertVideoInference into the collection
 func (mongoDB *MongoDB) InsertVideoInference(ctx context.Context, videoInference VideoInference) error {
-	collection := mongoDB.DB.Collection(VideoInferenceCollection)
+	collection := mongoDB.Db.Collection(VideoInferenceCollection)
 	_, err := collection.InsertOne(ctx, videoInference)
 	if (err != nil) {
 		log.Println(err)
@@ -109,7 +109,7 @@ func (mongoDB *MongoDB) InsertVideoInference(ctx context.Context, videoInference
 
 // GetVideoInference from the collection
 func (mongoDB *MongoDB) GetVideoInference(ctx context.Context, name string) (VideoInference, error) {
-	collection := mongoDB.DB.Collection(VideoInferenceCollection)
+	collection := mongoDB.Db.Collection(VideoInferenceCollection)
 	var videoInference VideoInference
 	err := collection.FindOne(ctx, bson.M{"_id" : name}).Decode(&videoInference)
 	if (err != nil) {
@@ -121,7 +121,7 @@ func (mongoDB *MongoDB) GetVideoInference(ctx context.Context, name string) (Vid
 
 // GetAllVideos from the collection
 func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
-	collection := mongoDB.DB.Collection(VideoCollection)
+	collection := mongoDB.Db.Collection(VideoCollection)
 	var videos []Video	= make([]Video, 0)
 	cur, err := collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -139,7 +139,7 @@ func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
 
 // FindAdsWithObjects find all ads that have objects in the given object list
 func (mongoDB *MongoDB) FindAdsWithObjects(ctx context.Context, objects []string) ([]Advertisement, error) {
-	collection := mongoDB.DB.Collection(AdCollection)
+	collection := mongoDB.Db.Collection(AdCollection)
 	var ads []Advertisement	= make([]Advertisement, 0)
 	cur, err := collection.Find(ctx, bson.M{"object": bson.M{"$in": objects}})
 	if err != nil {
