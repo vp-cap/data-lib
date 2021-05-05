@@ -14,5 +14,5 @@ type Storage interface {
 
 // GetStorageClient using the configuration
 func GetStorageClient(storageConfig config.StorageConfiguration) (Storage, error) {
-	return GetIPFSClusterStorage(storageConfig)
+	return GetIpfsClusterStorage(storageConfig)
 } 

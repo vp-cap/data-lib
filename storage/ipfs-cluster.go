@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"log"
+	"time"
 
 	config "github.com/vp-cap/data-lib/config"
 
@@ -11,13 +12,18 @@ import (
 	multiaddr "github.com/multiformats/go-multiaddr"
 )
 
+const (
+	MaxRetryCount = 10
+	SleepDuration = 10
+)
+
 // IPFSCluster Storage struct
 type IPFSCluster struct {
 	Client clusterClient.Client
 }
 
-// GetIPFSClusterStorage connection to the Storage Server
-func GetIPFSClusterStorage(storageConfig config.StorageConfiguration) (*IPFSCluster, error) {
+// GetIpfsClusterStorage connection to the Storage Server
+func GetIpfsClusterStorage(storageConfig config.StorageConfiguration) (*IPFSCluster, error) {
 	clusterAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.ClusterAPIAddr)
 	if err != nil {
 		log.Println(err)
@@ -28,15 +34,18 @@ func GetIPFSClusterStorage(storageConfig config.StorageConfiguration) (*IPFSClus
 		log.Println(err)
 		return nil, err
 	}
-
-	client, err := clusterClient.NewDefaultClient(&clusterClient.Config{
+	clusterClientConfig := &clusterClient.Config{
 		APIAddr:  clusterAPIAddr,
 		ProxyAddr: ipfsAPIAddr,
 		Username: storageConfig.ClusterUser,
 		Password: storageConfig.ClusterPass,
 		LogLevel: "info",
-	})
-	
+	};
+	client, err := clusterClient.NewDefaultClient(clusterClientConfig)
+	for retry := 0; retry < MaxRetryCount && err != nil; retry++ {
+		time.Sleep(SleepDuration * time.Second)
+		client, err = clusterClient.NewDefaultClient(clusterClientConfig)
+	}
 	if err != nil {
 		log.Println(err)
 		return nil, err
