@@ -6,16 +6,22 @@ import (
 	config "github.com/vp-cap/data-lib/config"
 )
 
+const (
+	STATUS_PROCESSING = "PROCESSING"
+	STATUS_COMPLETE= "COMPLETE"
+	STATUS_FAILED = "FAILED"
+)
+
 // Video Struct
 type Video struct {
-	Name        string `bson:"_id,omitempty"` // name unique
+	Name        string `bson:"name,omitempty"`
 	Description string `bson:"desc,omitempty"`
 	StorageLink string `bson:"link,omitempty"`
 }
 
 // Advertisement Struct
 type Advertisement struct {
-	Name        string `bson:"_id,omitempty"`
+	Name        string `bson:"name,omitempty"`
 	ImageLink   string `bson:"link,omitempty"`
 	RedirectURL string `bson:"redirectUrl,omitempty"`
 	Object      string `bson:"object,omitempty"`
@@ -29,7 +35,8 @@ type Interval struct {
 
 // VideoInference Struct
 type VideoInference struct {
-	Name                         string `bson:"_id,omitempty"` // video name
+	Id                           string `bson:"_id,omitempty"` // Video Identifier
+	Status                       string `bson:"status,omitempty"`// Video Inference processing status -> PROCESSING, COMPLETE, FAILED
 	ObjectCountsEachSecond       string
 	ObjectsToAvgFrequency        map[string]float32
 	TopFiveObjectsToInterval     map[string]Interval
@@ -45,10 +52,12 @@ type Database interface {
 	GetAd(context.Context, string) (Advertisement, error)
 	FindAdsWithObjects(context.Context, []string) ([]Advertisement, error)
 	InsertVideoInference(context.Context, VideoInference) error
+	UpdateVideoInference(context.Context, VideoInference) error
 	GetVideoInference(context.Context, string) (VideoInference, error)
+	InitializeVideoInference(context.Context, string) error
 }
 
 // GetDatabaseClient based on the configuration
 func GetDatabaseClient(ctx context.Context, dbConfig config.DatabaseConfiguration) (Database, error) {
-	return GetMongoDB(ctx, dbConfig)
+	return GetMongoDb(ctx, dbConfig)
 }

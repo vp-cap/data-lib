@@ -43,6 +43,7 @@ func GetIpfsClusterStorage(storageConfig config.StorageConfiguration) (*IPFSClus
 	};
 	client, err := clusterClient.NewDefaultClient(clusterClientConfig)
 	for retry := 0; retry < MaxRetryCount && err != nil; retry++ {
+		log.Println("Enable to connect to DB, retrying in", SleepDuration, "seconds")
 		time.Sleep(SleepDuration * time.Second)
 		client, err = clusterClient.NewDefaultClient(clusterClientConfig)
 	}

@@ -21,21 +21,22 @@ const (
 	VideoInferenceCollection = "VideoInference"
 )
 
-// MongoDB struct 
-type MongoDB struct {
+// MongoDb struct 
+type MongoDb struct {
 	Db     *mongo.Database
 }
 
-// GetMongoDB client connection to the database
-func GetMongoDB(ctx context.Context, dbConfig config.DatabaseConfiguration) (*MongoDB, error) {
+// GetMongoDb client connection to the database
+func GetMongoDb(ctx context.Context, dbConfig config.DatabaseConfiguration) (*MongoDb, error) {
 	clientOptions := options.Client().ApplyURI("mongodb://" + dbConfig.DBUser + ":" + dbConfig.DBPass + "@" + dbConfig.Address)
 	client, err := mongo.Connect(ctx, clientOptions)
 	for retry := 0; retry < MaxRetryCount && err != nil; retry++ {
+		log.Println("Enable to connect to DB, retrying in", SleepDuration, "seconds")
 		time.Sleep(SleepDuration * time.Second)
 		client, err = mongo.Connect(ctx, clientOptions)
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 	// Create an index for the ad collection on object as key to use when quering for ads using the objects in a video inference
@@ -45,14 +46,14 @@ func GetMongoDB(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 	if err != nil {
 		return nil, err
 	}
-	return &MongoDB{
+	return &MongoDb{
 		Db: client.Database(dbConfig.DBName),
 	}, nil
 }
 
 // InsertVideo into the collection
-func (mongoDB *MongoDB) InsertVideo(ctx context.Context, video Video) error {
-	collection := mongoDB.Db.Collection(VideoCollection)
+func (mongoDb *MongoDb) InsertVideo(ctx context.Context, video Video) error {
+	collection := mongoDb.Db.Collection(VideoCollection)
 	_, err := collection.InsertOne(ctx, video)
 	if (err != nil) {
 		log.Println(err)
@@ -62,11 +63,10 @@ func (mongoDB *MongoDB) InsertVideo(ctx context.Context, video Video) error {
 }
 
 // GetVideo from the collection
-func (mongoDB *MongoDB) GetVideo(ctx context.Context, name string) (Video, error) {
-	collection := mongoDB.Db.Collection(VideoCollection)
+func (mongoDb *MongoDb) GetVideo(ctx context.Context, id string) (Video, error) {
+	collection := mongoDb.Db.Collection(VideoCollection)
 	var video Video
-	err := collection.FindOne(ctx, bson.M{"_id" : name}).Decode(&video)
-	if (err != nil) {
+	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&video); err != nil {
 		log.Println(err)
 		return video, err
 	}
@@ -74,8 +74,8 @@ func (mongoDB *MongoDB) GetVideo(ctx context.Context, name string) (Video, error
 }
 
 // InsertAd into the collection
-func (mongoDB *MongoDB) InsertAd(ctx context.Context, ad Advertisement) error {
-	collection := mongoDB.Db.Collection(AdCollection)
+func (mongoDb *MongoDb) InsertAd(ctx context.Context, ad Advertisement) error {
+	collection := mongoDb.Db.Collection(AdCollection)
 	_, err := collection.InsertOne(ctx, ad)
 	if (err != nil) {
 		log.Println(err)
@@ -85,20 +85,30 @@ func (mongoDB *MongoDB) InsertAd(ctx context.Context, ad Advertisement) error {
 }
 
 // GetAd from the collection
-func (mongoDB *MongoDB) GetAd(ctx context.Context, name string) (Advertisement, error) {
-	collection := mongoDB.Db.Collection(AdCollection)
+func (mongoDb *MongoDb) GetAd(ctx context.Context, id string) (Advertisement, error) {
+	collection := mongoDb.Db.Collection(AdCollection)
 	var ad Advertisement
-	err := collection.FindOne(ctx, bson.M{"_id" : name}).Decode(&ad)
-	if (err != nil) {
+	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&ad); err != nil {
 		log.Println(err)
 		return ad, err
 	}
 	return ad, nil
 }
 
+// UpdateVideoInference into the collection
+func (mongoDb *MongoDb) UpdateVideoInference(ctx context.Context, videoInference VideoInference) error {
+	collection := mongoDb.Db.Collection(VideoInferenceCollection)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id" : videoInference.Id}, videoInference)
+	if (err != nil) {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
 // InsertVideoInference into the collection
-func (mongoDB *MongoDB) InsertVideoInference(ctx context.Context, videoInference VideoInference) error {
-	collection := mongoDB.Db.Collection(VideoInferenceCollection)
+func (mongoDb *MongoDb) InsertVideoInference(ctx context.Context, videoInference VideoInference) error {
+	collection := mongoDb.Db.Collection(VideoInferenceCollection)
 	_, err := collection.InsertOne(ctx, videoInference)
 	if (err != nil) {
 		log.Println(err)
@@ -108,20 +118,37 @@ func (mongoDB *MongoDB) InsertVideoInference(ctx context.Context, videoInference
 }
 
 // GetVideoInference from the collection
-func (mongoDB *MongoDB) GetVideoInference(ctx context.Context, name string) (VideoInference, error) {
-	collection := mongoDB.Db.Collection(VideoInferenceCollection)
+func (mongoDb *MongoDb) GetVideoInference(ctx context.Context, id string) (VideoInference, error) {
+	collection := mongoDb.Db.Collection(VideoInferenceCollection)
 	var videoInference VideoInference
-	err := collection.FindOne(ctx, bson.M{"_id" : name}).Decode(&videoInference)
-	if (err != nil) {
+	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&videoInference); err != nil {
 		log.Println(err)
 		return videoInference, err
 	}
 	return videoInference, nil
 }
 
+func (mongoDb *MongoDb) InitializeVideoInference(ctx context.Context, id string) error {
+	// TODO do we need a transaction here??
+	collection := mongoDb.Db.Collection(VideoInferenceCollection)
+	var videoInference VideoInference
+	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&videoInference); err != nil {
+		if (err == mongo.ErrNoDocuments) {
+			return mongoDb.InsertVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
+		} else {
+			return err;
+		}
+	} else {
+		if (videoInference.Status == STATUS_FAILED) {
+			return mongoDb.UpdateVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
+		} // else either complete or processing
+	}
+	return nil;
+}
+
 // GetAllVideos from the collection
-func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
-	collection := mongoDB.Db.Collection(VideoCollection)
+func (mongoDb *MongoDb) GetAllVideos(ctx context.Context) ([]Video, error) {
+	collection := mongoDb.Db.Collection(VideoCollection)
 	var videos []Video	= make([]Video, 0)
 	cur, err := collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -138,8 +165,8 @@ func (mongoDB *MongoDB) GetAllVideos(ctx context.Context) ([]Video, error) {
 }
 
 // FindAdsWithObjects find all ads that have objects in the given object list
-func (mongoDB *MongoDB) FindAdsWithObjects(ctx context.Context, objects []string) ([]Advertisement, error) {
-	collection := mongoDB.Db.Collection(AdCollection)
+func (mongoDb *MongoDb) FindAdsWithObjects(ctx context.Context, objects []string) ([]Advertisement, error) {
+	collection := mongoDb.Db.Collection(AdCollection)
 	var ads []Advertisement	= make([]Advertisement, 0)
 	cur, err := collection.Find(ctx, bson.M{"object": bson.M{"$in": objects}})
 	if err != nil {
