@@ -128,22 +128,24 @@ func (mongoDb *MongoDb) GetVideoInference(ctx context.Context, id string) (Video
 	return videoInference, nil
 }
 
-func (mongoDb *MongoDb) InitializeVideoInference(ctx context.Context, id string) error {
+// InitializeVideoInference with processing if it does not exist or the status is failed and return true to process
+// else return false (either in processing or complete)
+func (mongoDb *MongoDb) InitializeVideoInference(ctx context.Context, id string) (bool, error) {
 	// TODO do we need a transaction here??
 	collection := mongoDb.Db.Collection(VideoInferenceCollection)
 	var videoInference VideoInference
 	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&videoInference); err != nil {
 		if (err == mongo.ErrNoDocuments) {
-			return mongoDb.InsertVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
+			return true, mongoDb.InsertVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
 		} else {
-			return err;
+			return true, err;
 		}
 	} else {
 		if (videoInference.Status == STATUS_FAILED) {
-			return mongoDb.UpdateVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
+			return true, mongoDb.UpdateVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
 		} // else either complete or processing
 	}
-	return nil;
+	return false, nil;
 }
 
 // GetAllVideos from the collection

@@ -54,7 +54,7 @@ type Database interface {
 	InsertVideoInference(context.Context, VideoInference) error
 	UpdateVideoInference(context.Context, VideoInference) error
 	GetVideoInference(context.Context, string) (VideoInference, error)
-	InitializeVideoInference(context.Context, string) error
+	InitializeVideoInference(context.Context, string) (bool, error)
 }
 
 // GetDatabaseClient based on the configuration
