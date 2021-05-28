@@ -8,6 +8,7 @@ import (
 	config "github.com/vp-cap/data-lib/config"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -42,7 +43,7 @@ func GetMongoDb(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 	// Create an index for the ad collection on object as key to use when quering for ads using the objects in a video inference
 	adCollection := client.Database(dbConfig.DBName).Collection(AdCollection)
 	_, err = adCollection.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys: bson.D{{"object", "text"}},})
+		Keys: bson.D{{"object", 1}},})
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +55,7 @@ func GetMongoDb(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 // InsertVideo into the collection
 func (mongoDb *MongoDb) InsertVideo(ctx context.Context, video Video) error {
 	collection := mongoDb.Db.Collection(VideoCollection)
+	video._Id = primitive.NewObjectID().String()
 	_, err := collection.InsertOne(ctx, video)
 	if (err != nil) {
 		log.Println(err)
@@ -98,7 +100,7 @@ func (mongoDb *MongoDb) GetAd(ctx context.Context, id string) (Advertisement, er
 // UpdateVideoInference into the collection
 func (mongoDb *MongoDb) UpdateVideoInference(ctx context.Context, videoInference VideoInference) error {
 	collection := mongoDb.Db.Collection(VideoInferenceCollection)
-	_, err := collection.UpdateOne(ctx, bson.M{"_id" : videoInference.Id}, videoInference)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id" : videoInference._Id}, videoInference)
 	if (err != nil) {
 		log.Println(err)
 		return err
@@ -136,13 +138,13 @@ func (mongoDb *MongoDb) InitializeVideoInference(ctx context.Context, id string)
 	var videoInference VideoInference
 	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&videoInference); err != nil {
 		if (err == mongo.ErrNoDocuments) {
-			return true, mongoDb.InsertVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
+			return true, mongoDb.InsertVideoInference(ctx, VideoInference{_Id: id, Status: STATUS_PROCESSING})
 		} else {
 			return true, err;
 		}
 	} else {
 		if (videoInference.Status == STATUS_FAILED) {
-			return true, mongoDb.UpdateVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
+			return true, mongoDb.UpdateVideoInference(ctx, VideoInference{_Id: id, Status: STATUS_PROCESSING})
 		} // else either complete or processing
 	}
 	return false, nil;

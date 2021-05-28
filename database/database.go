@@ -14,17 +14,18 @@ const (
 
 // Video Struct
 type Video struct {
-	Name        string `bson:"name,omitempty"`
-	Description string `bson:"desc,omitempty"`
-	StorageLink string `bson:"link,omitempty"`
+	_Id         string
+	Name        string
+	Description string
+	StorageLink string
 }
 
 // Advertisement Struct
 type Advertisement struct {
-	Name        string `bson:"name,omitempty"`
-	ImageLink   string `bson:"link,omitempty"`
-	RedirectURL string `bson:"redirectUrl,omitempty"`
-	Object      string `bson:"object,omitempty"`
+	Name        string
+	ImageLink   string
+	RedirectURL string
+	Object      string
 }
 
 // Interval struct
@@ -35,12 +36,12 @@ type Interval struct {
 
 // VideoInference Struct
 type VideoInference struct {
-	Id                           string `bson:"_id,omitempty"` // Video Identifier
-	Status                       string `bson:"status,omitempty"`// Video Inference processing status -> PROCESSING, COMPLETE, FAILED
+	_Id                          string // Video Identifier
+	Status                       string // Video Inference processing status -> PROCESSING, COMPLETE, FAILED
 	ObjectCountsEachSecond       string
 	ObjectsToAvgFrequency        map[string]float32
 	TopFiveObjectsToInterval     map[string]Interval
-	TopFiveObjectsToAvgFrequency map[string]float32 `bson:"timeToObject,omitempty"`
+	TopFiveObjectsToAvgFrequency map[string]float32
 }
 
 // Database Interface
