@@ -55,7 +55,7 @@ func GetMongoDb(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 // InsertVideo into the collection
 func (mongoDb *MongoDb) InsertVideo(ctx context.Context, video Video) error {
 	collection := mongoDb.Db.Collection(VideoCollection)
-	video._Id = primitive.NewObjectID().String()
+	video.Id = primitive.NewObjectID().String()
 	_, err := collection.InsertOne(ctx, video)
 	if (err != nil) {
 		log.Println(err)
@@ -72,6 +72,7 @@ func (mongoDb *MongoDb) GetVideo(ctx context.Context, id string) (Video, error) 
 		log.Println(err)
 		return video, err
 	}
+	video.Id = id
 	return video, nil
 }
 
@@ -100,7 +101,7 @@ func (mongoDb *MongoDb) GetAd(ctx context.Context, id string) (Advertisement, er
 // UpdateVideoInference into the collection
 func (mongoDb *MongoDb) UpdateVideoInference(ctx context.Context, videoInference VideoInference) error {
 	collection := mongoDb.Db.Collection(VideoInferenceCollection)
-	_, err := collection.UpdateOne(ctx, bson.M{"_id" : videoInference._Id}, videoInference)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id" : videoInference.Id}, videoInference)
 	if (err != nil) {
 		log.Println(err)
 		return err
@@ -138,13 +139,13 @@ func (mongoDb *MongoDb) InitializeVideoInference(ctx context.Context, id string)
 	var videoInference VideoInference
 	if err := collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&videoInference); err != nil {
 		if (err == mongo.ErrNoDocuments) {
-			return true, mongoDb.InsertVideoInference(ctx, VideoInference{_Id: id, Status: STATUS_PROCESSING})
+			return true, mongoDb.InsertVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
 		} else {
 			return true, err;
 		}
 	} else {
 		if (videoInference.Status == STATUS_FAILED) {
-			return true, mongoDb.UpdateVideoInference(ctx, VideoInference{_Id: id, Status: STATUS_PROCESSING})
+			return true, mongoDb.UpdateVideoInference(ctx, VideoInference{Id: id, Status: STATUS_PROCESSING})
 		} // else either complete or processing
 	}
 	return false, nil;

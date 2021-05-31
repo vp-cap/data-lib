@@ -13,8 +13,9 @@ const (
 )
 
 // Video Struct
+// TODO find some alternative to annotation to make this generic
 type Video struct {
-	_Id         string
+	Id          string  `bson:"_id,omitempty"`
 	Name        string
 	Description string
 	StorageLink string
@@ -35,8 +36,9 @@ type Interval struct {
 }
 
 // VideoInference Struct
+// TODO find some alternative to annotation to make this generic
 type VideoInference struct {
-	_Id                          string // Video Identifier
+	Id                           string `bson:"_id,omitempty"` // Video Identifier
 	Status                       string // Video Inference processing status -> PROCESSING, COMPLETE, FAILED
 	ObjectCountsEachSecond       string
 	ObjectsToAvgFrequency        map[string]float32
