@@ -28,8 +28,8 @@ type MongoDb struct {
 }
 
 // GetMongoDb client connection to the database
-func GetMongoDb(ctx context.Context, dbConfig config.DatabaseConfiguration) (*MongoDb, error) {
-	clientOptions := options.Client().ApplyURI("mongodb://" + dbConfig.DBUser + ":" + dbConfig.DBPass + "@" + dbConfig.Address)
+func GetMongoDb(ctx context.Context, dbConfig config.MongoConfiguration) (*MongoDb, error) {
+	clientOptions := options.Client().ApplyURI("mongodb://" + dbConfig.DbUser + ":" + dbConfig.DbPass + "@" + dbConfig.Address)
 	client, err := mongo.Connect(ctx, clientOptions)
 	for retry := 0; retry < MaxRetryCount && err != nil; retry++ {
 		log.Println("Enable to connect to DB, retrying in", SleepDuration, "seconds")
@@ -41,14 +41,14 @@ func GetMongoDb(ctx context.Context, dbConfig config.DatabaseConfiguration) (*Mo
 		return nil, err
 	}
 	// Create an index for the ad collection on object as key to use when quering for ads using the objects in a video inference
-	adCollection := client.Database(dbConfig.DBName).Collection(AdCollection)
+	adCollection := client.Database(dbConfig.DbName).Collection(AdCollection)
 	_, err = adCollection.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: bson.D{{"object", 1}},})
 	if err != nil {
 		return nil, err
 	}
 	return &MongoDb{
-		Db: client.Database(dbConfig.DBName),
+		Db: client.Database(dbConfig.DbName),
 	}, nil
 }
 

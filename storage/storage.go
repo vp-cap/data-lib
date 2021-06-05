@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"errors"
 
 	config "github.com/vp-cap/data-lib/config"
 )
@@ -12,7 +13,12 @@ type Storage interface {
 	GetVideo(context.Context, string, string) error
 }
 
-// GetStorageClient using the configuration
+// GetStorageClient using the configuration, any new configurations will be added here
 func GetStorageClient(storageConfig config.StorageConfiguration) (Storage, error) {
-	return GetIpfsClusterStorage(storageConfig)
+	switch storageConfig.StorageType {
+	case config.DB_MONGO:
+		return GetIpfsClusterStorage(storageConfig.IpfsConfig)
+	default:
+		return nil, errors.New("undefined Storage type")
+	}
 } 

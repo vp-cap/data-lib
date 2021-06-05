@@ -17,19 +17,19 @@ const (
 	SleepDuration = 10
 )
 
-// IPFSCluster Storage struct
-type IPFSCluster struct {
+// IpfsCluster Storage struct
+type IpfsCluster struct {
 	Client clusterClient.Client
 }
 
 // GetIpfsClusterStorage connection to the Storage Server
-func GetIpfsClusterStorage(storageConfig config.StorageConfiguration) (*IPFSCluster, error) {
-	clusterAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.ClusterAPIAddr)
+func GetIpfsClusterStorage(storageConfig config.IpfsConfiguration) (*IpfsCluster, error) {
+	clusterAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.ClusterApiAddr)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	ipfsAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.IPFSAPIAddr)
+	ipfsAPIAddr, err := multiaddr.NewMultiaddr(storageConfig.IpfsApiAddr)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -52,11 +52,11 @@ func GetIpfsClusterStorage(storageConfig config.StorageConfiguration) (*IPFSClus
 		return nil, err
 	}
 
-	return &IPFSCluster{Client: client}, nil
+	return &IpfsCluster{Client: client}, nil
 }
 
 // UploadVideo in path to Storage
-func (ipfs *IPFSCluster) UploadVideo(ctx context.Context, path string) (string, error) {
+func (ipfs *IpfsCluster) UploadVideo(ctx context.Context, path string) (string, error) {
 	// log.Println(path)
 	// output channel
 	out := make(chan *api.AddedOutput, 1)
@@ -75,7 +75,7 @@ func (ipfs *IPFSCluster) UploadVideo(ctx context.Context, path string) (string, 
 }
 
 // GetVideo and store in the path
-func (ipfs *IPFSCluster) GetVideo(ctx context.Context, cid string, path string) error {
+func (ipfs *IpfsCluster) GetVideo(ctx context.Context, cid string, path string) error {
 	ipfsProxy := ipfs.Client.IPFS(ctx)
 	return ipfsProxy.Get(cid, path)
 }

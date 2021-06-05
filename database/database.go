@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 
 	config "github.com/vp-cap/data-lib/config"
 )
@@ -60,7 +61,12 @@ type Database interface {
 	InitializeVideoInference(context.Context, string) (bool, error)
 }
 
-// GetDatabaseClient based on the configuration
+// GetDatabaseClient based on the configuration, any implementations to be added here
 func GetDatabaseClient(ctx context.Context, dbConfig config.DatabaseConfiguration) (Database, error) {
-	return GetMongoDb(ctx, dbConfig)
+	switch dbConfig.DbType {
+	case config.DB_MONGO:
+		return GetMongoDb(ctx, dbConfig.MongoConfig)
+	default:
+		return nil, errors.New("undefined DB type")
+	}
 }

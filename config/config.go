@@ -1,17 +1,32 @@
 package config
 
-// StorageConfigurations exported
+const(
+	DB_MONGO = "mongodb"
+	STORAGE_IPFS = "ipfs"
+)
+
+// , any other implementations will be added here 
 type StorageConfiguration struct {
-	ClusterAPIAddr string
-	IPFSAPIAddr    string
+	StorageType      string
+	IpfsConfig  IpfsConfiguration	
+}
+
+type IpfsConfiguration struct {
+	ClusterApiAddr string
+	IpfsApiAddr    string
 	ClusterUser    string
 	ClusterPass    string
 }
 
-// DatabaseConfigurations exported
+// DatabaseConfiguration, any other implementations will be added here 
 type DatabaseConfiguration struct {
+	DbType      string
+	MongoConfig MongoConfiguration
+}
+
+type MongoConfiguration struct {
 	Address string
-	DBName  string
-	DBPass  string
-	DBUser  string
+	DbName  string
+	DbUser  string
+	DbPass  string
 }

@@ -1,6 +1,10 @@
 # Data lib
-VP-CAP Database and Storage interaction library
 
+VP-CAP Database and Storage interaction librarycurrently
+
+It exposes a db and storage interface to be used by other services. Currently has MongoDB and IPFS implementation.
+
+Refer architecture[https://github.com/vp-cap/architecture] for more details
 
 ## References
 - https://github.com/mongodb/mongo-go-driver
