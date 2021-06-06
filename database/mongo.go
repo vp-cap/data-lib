@@ -101,7 +101,7 @@ func (mongoDb *MongoDb) GetAd(ctx context.Context, id string) (Advertisement, er
 // UpdateVideoInference into the collection
 func (mongoDb *MongoDb) UpdateVideoInference(ctx context.Context, videoInference VideoInference) error {
 	collection := mongoDb.Db.Collection(VideoInferenceCollection)
-	_, err := collection.UpdateOne(ctx, bson.M{"_id" : videoInference.Id}, videoInference)
+	_, err := collection.UpdateOne(ctx, bson.M{"$set": bson.M{"_id" : videoInference.Id}}, videoInference)
 	if (err != nil) {
 		log.Println(err)
 		return err
