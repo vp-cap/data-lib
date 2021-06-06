@@ -17,7 +17,7 @@ type Storage interface {
 func GetStorageClient(storageConfig config.StorageConfiguration) (Storage, error) {
 	switch storageConfig.StorageType {
 	case config.STORAGE_IPFS:
-		return GetIpfsClusterStorage(storageConfig.IpfsConfig)
+		return GetIpfsClusterStorage(storageConfig.StorageConfig)
 	default:
 		return nil, errors.New("undefined Storage type")
 	}

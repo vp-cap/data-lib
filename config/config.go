@@ -8,7 +8,7 @@ const(
 // , any other implementations will be added here 
 type StorageConfiguration struct {
 	StorageType      string
-	IpfsConfig  IpfsConfiguration	
+	StorageConfig    IpfsConfiguration	
 }
 
 type IpfsConfiguration struct {
